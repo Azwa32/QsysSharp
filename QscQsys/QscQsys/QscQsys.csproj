@@ -47,10 +47,6 @@
     <GenerateSerializationAssemblies>off</GenerateSerializationAssemblies>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ExtensionMethods, Version=1.0.0.27412, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Dependencies\ExtensionMethods.dll</HintPath>
-    </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="SimplSharpCustomAttributesInterface, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1099c178b3b54c3b, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -71,13 +67,19 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
-    <Reference Include="TCPClient, Version=1.0.0.17872, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Dependencies\TCPClient.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Annotations.cs" />
+    <Compile Include="Communications\AbstractCommunicator.cs" />
+    <Compile Include="Communications\ICommunicator.cs" />
+    <Compile Include="Communications\Sockets\AbstractSocketCommunicator.cs" />
+    <Compile Include="Communications\Sockets\ConnectionStatusChangeEventArgs.cs" />
+    <Compile Include="Communications\Sockets\ConnectionStatusChangeEventHandler.cs" />
+    <Compile Include="Communications\Sockets\ConnectionStatusChangePayload.cs" />
+    <Compile Include="Communications\Sockets\ISocketCommunicator.cs" />
+    <Compile Include="Communications\Sockets\TcpClient.cs" />
+    <Compile Include="Communications\StringExtensions.cs" />
+    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="Intermediaries\AbstractIntermediaryControl.cs" />
     <Compile Include="Intermediaries\IQsysIntermediary.cs" />
     <Compile Include="Intermediaries\IQsysIntermediaryControl.cs" />
@@ -85,6 +87,16 @@
     <Compile Include="Intermediaries\NamedComponentControl.cs" />
     <Compile Include="Intermediaries\NamedControl.cs" />
     <Compile Include="Json.cs" />
+    <Compile Include="ModuleFramework\Events\BoolEventArgs.cs" />
+    <Compile Include="ModuleFramework\Events\BoolEventHandler.cs" />
+    <Compile Include="ModuleFramework\Events\GenericEventArgs.cs" />
+    <Compile Include="ModuleFramework\Events\StringEventArgs.cs" />
+    <Compile Include="ModuleFramework\Events\StringEventHandler.cs" />
+    <Compile Include="ModuleFramework\Events\UShortEventArgs.cs" />
+    <Compile Include="ModuleFramework\Events\UShortEventHandler.cs" />
+    <Compile Include="ModuleFramework\Logging\DebugLevels.cs" />
+    <Compile Include="ModuleFramework\Logging\ILogger.cs" />
+    <Compile Include="ModuleFramework\Logging\Logger.cs" />
     <Compile Include="NamedComponents\GenericComponentControl\AbstractGenericComponentControl.cs" />
     <Compile Include="NamedComponents\GenericComponentControl\BoolGenericComponentControl.cs" />
     <Compile Include="NamedComponents\GenericComponentControl\IntegerGenericComponentControl.cs" />
@@ -94,7 +106,6 @@
     <Compile Include="NamedComponents\QsysMatrixMixerOutputFader.cs" />
     <Compile Include="NamedComponents\QsysMatrixMixerInputFader.cs" />
     <Compile Include="NamedComponents\QsysMediacastRouter.cs" />
-    <Compile Include="QsysBackupCore.cs" />
     <Compile Include="NamedComponents\QsysCamera.cs" />
     <Compile Include="NamedComponents\AbstractQsysComponent.cs" />
     <Compile Include="QsysCoreManager.cs" />
@@ -120,8 +131,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CompactFramework.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>rem  S# preparation will execute after these operations
-copy "$(TargetDir)TCPClient.dll" "$(SolutionDir)Dependencies\"
-copy "$(TargetDir)ExtensionMethods.dll" "$(SolutionDir)Dependencies\"</PostBuildEvent>
+    <PostBuildEvent>rem  S# preparation will execute after these operations</PostBuildEvent>
   </PropertyGroup>
 </Project>

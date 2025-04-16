@@ -4,6 +4,11 @@
         <name>QscQsys</name>
     </assembly>
     <members>
+        <member name="T:QscQsys.NamedComponents.GenericComponentControl.TriggerGenericComponentControl">
+            <summary>
+            Control a trigger as part of any kind of named component
+            </summary>
+        </member>
         <member name="M:QscQsys.NamedComponents.AbstractQsysComponent.InternalInitialize(System.String,System.String)">
             <summary>
             Initialize to be called from concrete's initialize method
@@ -16,23 +21,10 @@
             Clean up of unmanaged resources
             </summary>
         </member>
-        <member name="T:QscQsys.Intermediaries.NamedControl">
+        <member name="T:QscQsys.NamedComponents.GenericComponentControl.AbstractGenericComponentControl">
             <summary>
-            Acts as an intermediary between the QSys Core and the QsysNamedControls
+            Abstract implementation to control a single control of a named component
             </summary>
-        </member>
-        <member name="T:QscQsys.Intermediaries.NamedComponent">
-            <summary>
-            Acts as an intermediary between the QSys Core and the QsysNamedControls
-            </summary>
-        </member>
-        <member name="M:QscQsys.QsysMatrixMixerApi.SetCrossPointMute(System.String,System.String,System.Boolean)">
-            <summary>
-            Sets a crosspoint mute ex. *=everything, 1 2 3=channels 1, 2, 3,  1-6=channels 1 through 6, 1-8 !3=channels 1 through 8 except 3, * !3-5=everything but 3 through 5
-            </summary>
-            <param name="inputs">The input channels.</param>
-            <param name="outputs">The output channels.</param>
-            <param name="value">The value of the crosspoint mute.</param>
         </member>
         <member name="M:QscQsys.Utils.SimplUtils.ScaleToUshort(System.Double)">
             <summary>
@@ -62,6 +54,195 @@
             <param name="level"></param>
             <exception cref="T:System.ArgumentOutOfRangeException">If level is below 0 or above 65535</exception>
             <returns></returns>
+        </member>
+        <member name="M:QscQsys.NamedComponents.QsysRouter.OutputMute(System.UInt16)">
+            <summary>
+            Sets the current mute state.
+            </summary>
+            <param name="value">The state to set the mute.</param>
+        </member>
+        <member name="T:QscQsys.QsysCore">
+            <summary>
+            Q-SYS Core class that manages connection and parses responses to be distributed to components and named control classes.
+            </summary>
+        </member>
+        <member name="M:QscQsys.QsysCore.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:QscQsys.QsysCore"/> class.
+            </summary>
+        </member>
+        <member name="M:QscQsys.QsysCore.Debug(System.UInt16)">
+            <summary>
+            Set debug mode.
+            </summary>
+            <param name="value">Debug level to set.</param>
+            <remarks>
+            Debug level 0 = off
+            Debug level 1 = Main communications
+            Debug level 2 = Main communications and verbose console
+            </remarks>
+        </member>
+        <member name="M:QscQsys.QsysCore.Initialize(System.String,System.String,System.String,System.UInt16,System.String,System.String,System.UInt16)">
+            <summary>
+            Initialzes all methods that are required to setup the class. Connection is established on port 1702.
+            </summary>
+        </member>
+        <member name="M:QscQsys.QsysCore.NewExternalResponse(System.String)">
+            <summary>
+            Enqueue response from SIMPL to be parsed
+            </summary>
+            <param name="response">Response from SIMPL to be parsed</param>
+        </member>
+        <member name="M:QscQsys.QsysCore.Dispose">
+            <summary>
+            Clean up of unmanaged resources
+            </summary>
+        </member>
+        <member name="P:QscQsys.QsysCore.IsInitialized">
+            <summary>
+            Gets initialzation status.
+            </summary>
+        </member>
+        <member name="P:QscQsys.QsysCore.IsDisposed">
+            <summary>
+            Gets disposed status.
+            </summary>
+        </member>
+        <member name="P:QscQsys.QsysCore.PrimaryIsConnected">
+            <summary>
+            Gets primary core connection status.
+            </summary>
+        </member>
+        <member name="P:QscQsys.QsysCore.SecondaryIsConnected">
+            <summary>
+            Gets backup core connection status.
+            </summary>
+        </member>
+        <member name="P:QscQsys.QsysCore.IsAuthenticated">
+            <summary>
+            Gets authentication status.
+            </summary>
+        </member>
+        <member name="P:QscQsys.QsysCore.IsDebugMode">
+            <summary>
+            Gets debug mode.
+            </summary>
+        </member>
+        <member name="P:QscQsys.QsysCore.MaxLogonAttemps">
+            <summary>
+            Gets or sets the max logon attempts made when trying to authorize with the core.
+            </summary>
+        </member>
+        <member name="P:QscQsys.QsysCore.IsRedundant">
+            <summary>
+            Gets redundant status.
+            </summary>
+        </member>
+        <member name="P:QscQsys.QsysCore.IsEmulator">
+            <summary>
+            Gets emulator status.
+            </summary>
+        </member>
+        <member name="P:QscQsys.QsysCore.DesignName">
+            <summary>
+            Gets running design name.
+            </summary>
+        </member>
+        <member name="P:QscQsys.QsysCore.PrimaryCoreActive">
+            <summary>
+            Gets a bool representing the primary core active status.
+            </summary>
+        </member>
+        <member name="P:QscQsys.QsysCore.BackupCoreActive">
+            <summary>
+            Gets a bool representing the backup core active status.
+            </summary>
+        </member>
+        <member name="P:QscQsys.QsysCore.CoreId">
+            <summary>
+            Get the core ID.
+            </summary>
+        </member>
+        <member name="P:QscQsys.QsysCore.Port">
+            <summary>
+            Get or set the network port. If currently connected, changing the port will reconnect with the new port number.
+            </summary>
+        </member>
+        <member name="P:QscQsys.QsysCore.PrimaryHost">
+            <summary>
+            Gets or sets the primary core network host address. If currently connected, changing the host will reconnect with the new host address.
+            </summary>
+        </member>
+        <member name="P:QscQsys.QsysCore.BackupHost">
+            <summary>
+            Gets or sets the backup core network host address. If currently connected, changing the host will reconnect with the new host address.
+            </summary>
+        </member>
+        <member name="P:QscQsys.QsysCore.Username">
+            <summary>
+            Gets or sets the username used to authenticate with the core.
+            </summary>
+        </member>
+        <member name="P:QscQsys.QsysCore.Password">
+            <summary>
+            Sets the password used to authenticate with the core.
+            </summary>
+        </member>
+        <member name="M:QscQsys.QsysMatrixMixerApi.SetCrossPointMute(System.String,System.String,System.Boolean)">
+            <summary>
+            Sets a crosspoint mute ex. *=everything, 1 2 3=channels 1, 2, 3,  1-6=channels 1 through 6, 1-8 !3=channels 1 through 8 except 3, * !3-5=everything but 3 through 5
+            </summary>
+            <param name="inputs">The input channels.</param>
+            <param name="outputs">The output channels.</param>
+            <param name="value">The value of the crosspoint mute.</param>
+        </member>
+        <member name="M:QscQsys.NamedComponents.QsysFader.Volume(System.UInt16)">
+            <summary>
+            Sets the current volume value.
+            </summary>
+            <param name="value">Volume value to set the fader to.</param>
+        </member>
+        <member name="M:QscQsys.NamedComponents.QsysFader.Mute(System.Boolean)">
+            <summary>
+            Sets the current mute state.
+            </summary>
+            <param name="value">The state to set the mute.</param>
+        </member>
+        <member name="M:QscQsys.NamedComponents.QsysFader.Mute(System.UInt16)">
+            <summary>
+            Sets the current mute state.
+            </summary>
+            <param name="value">The state to set the mute.</param>
+        </member>
+        <member name="T:QscQsys.Intermediaries.NamedControl">
+            <summary>
+            Acts as an intermediary between the QSys Core and the QsysNamedControls
+            </summary>
+        </member>
+        <member name="T:QscQsys.NamedComponents.GenericComponentControl.BoolGenericComponentControl">
+            <summary>
+            Control a boolean control as part of any named component
+            </summary>
+        </member>
+        <member name="T:QscQsys.Intermediaries.NamedComponent">
+            <summary>
+            Acts as an intermediary between the QSys Core and the QsysNamedControls
+            </summary>
+        </member>
+        <member name="T:QscQsys.NamedComponents.QsysMediacastRouter">
+            <summary>
+            Router for Q-Sys cameras
+            </summary>
+        </member>
+        <member name="T:QscQsys.QsysInternalEventsArgs">
+            <summary>
+            Used only for internal methods.
+            </summary>
+        </member>
+        <member name="T:QscQsys.NamedComponents.GenericComponentControl.IntegerGenericComponentControl">
+             <summary>
+            Control an integer control as part of any named component 
+             </summary>
         </member>
         <member name="T:JetBrains.Annotations.CanBeNullAttribute">
             <summary>
@@ -423,161 +604,822 @@
             <c>System.Web.WebPages.WebPageBase.RenderSection(String)</c>
             </summary>
         </member>
-        <member name="M:QscQsys.NamedComponents.QsysRouter.OutputMute(System.UInt16)">
+        <member name="T:QscQsys.Communications.Sockets.ISocketCommunicator">
             <summary>
-            Sets the current mute state.
-            </summary>
-            <param name="value">The state to set the mute.</param>
-        </member>
-        <member name="M:QscQsys.NamedComponents.QsysFader.Volume(System.UInt16)">
-            <summary>
-            Sets the current volume value.
-            </summary>
-            <param name="value">Volume value to set the fader to.</param>
-        </member>
-        <member name="M:QscQsys.NamedComponents.QsysFader.Mute(System.Boolean)">
-            <summary>
-            Sets the current mute state.
-            </summary>
-            <param name="value">The state to set the mute.</param>
-        </member>
-        <member name="M:QscQsys.NamedComponents.QsysFader.Mute(System.UInt16)">
-            <summary>
-            Sets the current mute state.
-            </summary>
-            <param name="value">The state to set the mute.</param>
-        </member>
-        <member name="T:QscQsys.QsysCore">
-            <summary>
-            Q-SYS Core class that manages connection and parses responses to be distributed to components and named control classes.
+            Represents a socket interface for communication.
             </summary>
         </member>
-        <member name="M:QscQsys.QsysCore.#ctor">
+        <member name="M:QscQsys.Communications.Sockets.ISocketCommunicator.Connect">
             <summary>
-            Initializes a new instance of the <see cref="T:QscQsys.QsysCore"/> class.
+            Connects to the socket.
             </summary>
         </member>
-        <member name="M:QscQsys.QsysCore.Debug(System.UInt16)">
+        <member name="M:QscQsys.Communications.Sockets.ISocketCommunicator.Connect(System.String,System.UInt16)">
             <summary>
-            Set debug mode.
+            Connects to the socket with the specified IP address and port.
             </summary>
-            <param name="value">Debug level to set.</param>
-            <remarks>
-            Debug level 0 = off
-            Debug level 1 = Main communications
-            Debug level 2 = Main communications and verbose console
-            </remarks>
+            <param name="ipAddress">The IP address to connect to.</param>
+            <param name="port">The port to connect to.</param>
         </member>
-        <member name="M:QscQsys.QsysCore.Initialize(System.String,System.String,System.String,System.UInt16,System.String,System.String,System.UInt16)">
+        <member name="M:QscQsys.Communications.Sockets.ISocketCommunicator.Disconnect">
             <summary>
-            Initialzes all methods that are required to setup the class. Connection is established on port 1702.
+            Disconnects from the socket.
             </summary>
         </member>
-        <member name="M:QscQsys.QsysCore.NewExternalResponse(System.String)">
+        <member name="M:QscQsys.Communications.Sockets.ISocketCommunicator.SendCommand(System.String)">
             <summary>
-            Enqueue response from SIMPL to be parsed
+            Sends a command as a string.
             </summary>
-            <param name="response">Response from SIMPL to be parsed</param>
+            <param name="command">The command to send as a string.</param>
         </member>
-        <member name="M:QscQsys.QsysCore.Dispose">
+        <member name="M:QscQsys.Communications.Sockets.ISocketCommunicator.SendCommand(System.Char[])">
             <summary>
-            Clean up of unmanaged resources
+            Sends a command as a character array.
             </summary>
+            <param name="command">The command to send as a character array.</param>
         </member>
-        <member name="P:QscQsys.QsysCore.IsInitialized">
+        <member name="M:QscQsys.Communications.Sockets.ISocketCommunicator.SendCommand(System.Byte[])">
             <summary>
-            Gets initialzation status.
+            Sends a command as a byte array.
             </summary>
+            <param name="command">The command to send as a byte array.</param>
         </member>
-        <member name="P:QscQsys.QsysCore.IsDisposed">
+        <member name="E:QscQsys.Communications.Sockets.ISocketCommunicator.ConnectedChange">
             <summary>
-            Gets disposed status.
-            </summary>
-        </member>
-        <member name="P:QscQsys.QsysCore.PrimaryIsConnected">
-            <summary>
-            Gets primary core connection status.
+            Event that is raised when the connected state changes.
             </summary>
         </member>
-        <member name="P:QscQsys.QsysCore.SecondaryIsConnected">
+        <member name="E:QscQsys.Communications.Sockets.ISocketCommunicator.ConnectionStatusChange">
             <summary>
-            Gets backup core connection status.
+            Event that is raised when the connection status changes.
             </summary>
         </member>
-        <member name="P:QscQsys.QsysCore.IsAuthenticated">
+        <member name="E:QscQsys.Communications.Sockets.ISocketCommunicator.ResponseReceived">
             <summary>
-            Gets authentication status.
+            Event that is triggered when a response is received.
             </summary>
         </member>
-        <member name="P:QscQsys.QsysCore.IsDebugMode">
+        <member name="P:QscQsys.Communications.Sockets.ISocketCommunicator.IsConnected">
             <summary>
-            Gets debug mode.
+            Gets a value indicating whether the socket is currently connected.
             </summary>
         </member>
-        <member name="P:QscQsys.QsysCore.MaxLogonAttemps">
+        <member name="P:QscQsys.Communications.Sockets.ISocketCommunicator.ConnectionStatus">
             <summary>
-            Gets or sets the max logon attempts made when trying to authorize with the core.
+            Gets the connection status of the socket.
             </summary>
         </member>
-        <member name="P:QscQsys.QsysCore.IsRedundant">
+        <member name="P:QscQsys.Communications.Sockets.ISocketCommunicator.IpAddress">
             <summary>
-            Gets redundant status.
+            Gets or sets the IP address for the socket connection.
             </summary>
         </member>
-        <member name="P:QscQsys.QsysCore.IsEmulator">
+        <member name="P:QscQsys.Communications.Sockets.ISocketCommunicator.Port">
             <summary>
-            Gets emulator status.
+            Gets or sets the port number for the socket connection.
             </summary>
         </member>
-        <member name="P:QscQsys.QsysCore.DesignName">
+        <member name="T:QscQsys.Communications.Sockets.AbstractSocketCommunicator">
             <summary>
-            Gets running design name.
+            Abstract base class for a socket communicator that implements the ISocket interface.
             </summary>
         </member>
-        <member name="P:QscQsys.QsysCore.PrimaryCoreActive">
+        <member name="T:QscQsys.Communications.AbstractCommunicator">
             <summary>
-            Gets a bool representing the primary core active status.
+            Abstract base class for a communicator that implements the <see cref="T:QscQsys.Communications.ICommunicator"/> interface and provides common functionality.
             </summary>
         </member>
-        <member name="P:QscQsys.QsysCore.BackupCoreActive">
+        <member name="T:QscQsys.Communications.ICommunicator">
             <summary>
-            Gets a bool representing the backup core active status.
+            Represents a communication interface for sending and receiving commands.
             </summary>
         </member>
-        <member name="P:QscQsys.QsysCore.CoreId">
+        <member name="M:QscQsys.Communications.ICommunicator.Dispose">
             <summary>
-            Get the core ID.
+            Disposes the communicator and releases any resources.
             </summary>
         </member>
-        <member name="P:QscQsys.QsysCore.Port">
+        <member name="P:QscQsys.Communications.ICommunicator.Disposed">
             <summary>
-            Get or set the network port. If currently connected, changing the port will reconnect with the new port number.
+            Gets a value indicating whether the communicator has been disposed.
             </summary>
         </member>
-        <member name="P:QscQsys.QsysCore.PrimaryHost">
+        <member name="P:QscQsys.Communications.ICommunicator.ID">
             <summary>
-            Gets or sets the primary core network host address. If currently connected, changing the host will reconnect with the new host address.
+            Gets the ID of the communicator.
             </summary>
         </member>
-        <member name="P:QscQsys.QsysCore.BackupHost">
+        <member name="P:QscQsys.Communications.ICommunicator.DebugLevel">
             <summary>
-            Gets or sets the backup core network host address. If currently connected, changing the host will reconnect with the new host address.
+            Gets or sets the debug level for logging. Valid values are 0 (Disabled), 1 (LoggingEnabled), 2 (DebugEnabled), and 3 (AllEnabled).
             </summary>
         </member>
-        <member name="P:QscQsys.QsysCore.Username">
+        <member name="M:QscQsys.Communications.AbstractCommunicator.Dispose">
             <summary>
-            Gets or sets the username used to authenticate with the core.
+            Disposes the communicator and releases any resources.
             </summary>
         </member>
-        <member name="P:QscQsys.QsysCore.Password">
+        <member name="M:QscQsys.Communications.AbstractCommunicator.#ctor">
             <summary>
-            Sets the password used to authenticate with the core.
+            Initializes a new instance of the <see cref="T:QscQsys.Communications.AbstractCommunicator"/> class with a generated ID and default logger.
             </summary>
         </member>
-        <member name="T:QscQsys.QsysInternalEventsArgs">
+        <member name="M:QscQsys.Communications.AbstractCommunicator.#ctor(System.String)">
             <summary>
-            Used only for internal methods.
+            Initializes a new instance of the <see cref="T:QscQsys.Communications.AbstractCommunicator"/> class with the specified ID and default logger.
             </summary>
+            <param name="id">The ID of the communicator.</param>
+        </member>
+        <member name="M:QscQsys.Communications.AbstractCommunicator.#ctor(QscQsys.ModuleFramework.Logging.ILogger)">
+            <summary>
+            Initializes a new instance of the <see cref="T:QscQsys.Communications.AbstractCommunicator"/> class with a generated ID and the specified logger.
+            </summary>
+            <param name="logger">The logger to use for logging.</param>
+        </member>
+        <member name="M:QscQsys.Communications.AbstractCommunicator.#ctor(System.String,QscQsys.ModuleFramework.Logging.ILogger)">
+            <summary>
+            Initializes a new instance of the <see cref="T:QscQsys.Communications.AbstractCommunicator"/> class with the specified ID and logger.
+            </summary>
+            <param name="id">The ID of the communicator.</param>
+            <param name="logger">The logger to use for logging.</param>
+        </member>
+        <member name="P:QscQsys.Communications.AbstractCommunicator.Disposed">
+            <summary>
+            Gets a value indicating whether the communicator has been disposed.
+            </summary>
+        </member>
+        <member name="P:QscQsys.Communications.AbstractCommunicator.ID">
+            <summary>
+            Gets the ID of the communicator.
+            </summary>
+        </member>
+        <member name="P:QscQsys.Communications.AbstractCommunicator.DebugLevel">
+            <summary>
+            Gets or sets the debug level for logging. Valid values are 0 (Disabled), 1 (LoggingEnabled), 2 (DebugEnabled), and 3 (AllEnabled).
+            </summary>
+        </member>
+        <member name="M:QscQsys.Communications.Sockets.AbstractSocketCommunicator.#ctor">
+            <summary>
+            Initializes a new instance of the SocketCommunicator class.
+            </summary>
+        </member>
+        <member name="M:QscQsys.Communications.Sockets.AbstractSocketCommunicator.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the SocketCommunicator class with the specified ID.
+            </summary>
+            <param name="id">The ID of the socket communicator.</param>
+        </member>
+        <member name="M:QscQsys.Communications.Sockets.AbstractSocketCommunicator.#ctor(QscQsys.ModuleFramework.Logging.ILogger)">
+            <summary>
+            Initializes a new instance of the SocketCommunicator class with the specified logger.
+            </summary>
+            <param name="logger">The logger to use for logging.</param>
+        </member>
+        <member name="M:QscQsys.Communications.Sockets.AbstractSocketCommunicator.#ctor(System.String,QscQsys.ModuleFramework.Logging.ILogger)">
+            <summary>
+            Initializes a new instance of the SocketCommunicator class with the specified ID and logger.
+            </summary>
+            <param name="id">The ID of the socket communicator.</param>
+            <param name="logger">The logger to use for logging.</param>
+        </member>
+        <member name="M:QscQsys.Communications.Sockets.AbstractSocketCommunicator.Connect">
+            <summary>
+            Connects to the socket.
+            </summary>
+        </member>
+        <member name="M:QscQsys.Communications.Sockets.AbstractSocketCommunicator.Connect(System.String,System.UInt16)">
+            <summary>
+            Connects to the socket with the specified IP address and port.
+            </summary>
+            <param name="ipAddress">The IP address to connect to.</param>
+            <param name="port">The port to connect to.</param>
+        </member>
+        <member name="M:QscQsys.Communications.Sockets.AbstractSocketCommunicator.Disconnect">
+            <summary>
+            Disconnects from the socket.
+            </summary>
+        </member>
+        <member name="M:QscQsys.Communications.Sockets.AbstractSocketCommunicator.SendCommand(System.String)">
+            <summary>
+            Sends a command as a string.
+            </summary>
+            <param name="command">The command to send as a string.</param>
+        </member>
+        <member name="M:QscQsys.Communications.Sockets.AbstractSocketCommunicator.SendCommand(System.Char[])">
+            <summary>
+            Sends a command as a character array.
+            </summary>
+            <param name="command">The command to send as a character array.</param>
+        </member>
+        <member name="M:QscQsys.Communications.Sockets.AbstractSocketCommunicator.SendCommand(System.Byte[])">
+            <summary>
+            Sends a command as a byte array.
+            </summary>
+            <param name="command">The command to send as a byte array.</param>
+        </member>
+        <member name="M:QscQsys.Communications.Sockets.AbstractSocketCommunicator.GetSocketStatusName(Crestron.SimplSharp.CrestronSockets.SocketStatus)">
+            <summary>
+            Gets the name of the socket status based on the provided SocketStatus value.
+            </summary>
+            <param name="value">The SocketStatus value.</param>
+            <returns>The name of the socket status.</returns>
+        </member>
+        <member name="M:QscQsys.Communications.Sockets.AbstractSocketCommunicator.GetSocketErrorCodeName(Crestron.SimplSharp.CrestronSockets.SocketErrorCodes)">
+            <summary>
+            Gets the name of the socket error code based on the provided SocketErrorCodes value.
+            </summary>
+            <param name="value">The SocketErrorCodes value.</param>
+            <returns>The name of the socket error code.</returns>
+        </member>
+        <member name="M:QscQsys.Communications.Sockets.AbstractSocketCommunicator.GetWebSocketResultCodeName(Crestron.SimplSharp.CrestronWebSocketClient.WebSocketClient.WEBSOCKET_RESULT_CODES)">
+            <summary>
+            Gets the name of the web socket result code based on the provided WEBSOCKET_RESULT_CODES value.
+            </summary>
+            <param name="value">The WEBSOCKET_RESULT_CODES value.</param>
+            <returns>The name of the web socket result code.</returns>
+        </member>
+        <member name="M:QscQsys.Communications.Sockets.AbstractSocketCommunicator.GetWebSocketPackekTypeName(Crestron.SimplSharp.CrestronWebSocketClient.WebSocketClient.WEBSOCKET_PACKET_TYPES)">
+            <summary>
+            Gets the name of the web socket packet type based on the provided WEBSOCKET_PACKET_TYPES value.
+            </summary>
+            <param name="value">The WEBSOCKET_PACKET_TYPES value.</param>
+            <returns>The name of the web socket packet type.</returns>
+        </member>
+        <member name="M:QscQsys.Communications.Sockets.AbstractSocketCommunicator.OnConnectedChange(QscQsys.ModuleFramework.Events.BoolEventArgs)">
+            <summary>
+            Raises the ConnectedChange event with the provided event arguments.
+            </summary>
+            <param name="args">The event arguments.</param>
+        </member>
+        <member name="M:QscQsys.Communications.Sockets.AbstractSocketCommunicator.OnConnectionStatusChange(QscQsys.Communications.Sockets.ConnectionStatusChangeEventArgs)">
+            <summary>
+            Raises the ConnectionStatusChange event with the provided event arguments.
+            </summary>
+            <param name="args">The event arguments.</param>
+        </member>
+        <member name="M:QscQsys.Communications.Sockets.AbstractSocketCommunicator.OnResponseReceived(QscQsys.ModuleFramework.Events.StringEventArgs)">
+            <summary>
+            Raises the <see cref="E:QscQsys.Communications.Sockets.AbstractSocketCommunicator.ResponseReceived"/> event with the specified event arguments.
+            </summary>
+            <param name="args">The event arguments.</param>
+        </member>
+        <member name="E:QscQsys.Communications.Sockets.AbstractSocketCommunicator.ConnectedChange">
+            <summary>
+            Event that is raised when the connected state changes.
+            </summary>
+        </member>
+        <member name="E:QscQsys.Communications.Sockets.AbstractSocketCommunicator.ConnectionStatusChange">
+            <summary>
+            Event that is raised when the connection status changes.
+            </summary>
+        </member>
+        <member name="E:QscQsys.Communications.Sockets.AbstractSocketCommunicator.ResponseReceived">
+            <summary>
+            Event that is triggered when a response is received.
+            </summary>
+        </member>
+        <member name="P:QscQsys.Communications.Sockets.AbstractSocketCommunicator.IsConnected">
+            <summary>
+            Gets a value indicating whether the socket is currently connected.
+            </summary>
+        </member>
+        <member name="P:QscQsys.Communications.Sockets.AbstractSocketCommunicator.ConnectionStatus">
+            <summary>
+            Gets the connection status of the socket.
+            </summary>
+        </member>
+        <member name="P:QscQsys.Communications.Sockets.AbstractSocketCommunicator.IpAddress">
+            <summary>
+            Gets or sets the IP address for the socket connection.
+            </summary>
+        </member>
+        <member name="P:QscQsys.Communications.Sockets.AbstractSocketCommunicator.Port">
+            <summary>
+            Gets or sets the port number for the socket connection.
+            </summary>
+        </member>
+        <member name="T:QscQsys.Communications.Sockets.ConnectionStatusChangePayload">
+            <summary>
+            Represents the payload containing connection status change information.
+            </summary>
+        </member>
+        <member name="M:QscQsys.Communications.Sockets.ConnectionStatusChangePayload.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:QscQsys.Communications.Sockets.ConnectionStatusChangePayload"/> class.
+            </summary>
+        </member>
+        <member name="M:QscQsys.Communications.Sockets.ConnectionStatusChangePayload.#ctor(System.UInt16,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:QscQsys.Communications.Sockets.ConnectionStatusChangePayload"/> class with the specified index and status.
+            </summary>
+            <param name="index">The index associated with the connection status change.</param>
+            <param name="status">The status of the connection.</param>
+        </member>
+        <member name="P:QscQsys.Communications.Sockets.ConnectionStatusChangePayload.Index">
+            <summary>
+            Gets or sets the index associated with the connection status change.
+            </summary>
+        </member>
+        <member name="P:QscQsys.Communications.Sockets.ConnectionStatusChangePayload.Status">
+            <summary>
+            Gets or sets the status of the connection.
+            </summary>
+        </member>
+        <member name="T:QscQsys.Communications.Sockets.ConnectionStatusChangeEventHandler">
+            <summary>
+            Represents the method that handles connection status change events.
+            </summary>
+            <param name="sender">The event sender.</param>
+            <param name="args">The event arguments containing connection status change information.</param>
+        </member>
+        <member name="T:QscQsys.Communications.Sockets.ConnectionStatusChangeEventArgs">
+            <summary>
+            Event arguments class for connection status change events.
+            </summary>
+        </member>
+        <member name="T:QscQsys.ModuleFramework.Events.GenericEventArgs`1">
+            <summary>
+            Represents generic event arguments with a payload of type <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T">The type of the payload.</typeparam>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Events.GenericEventArgs`1.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:QscQsys.ModuleFramework.Events.GenericEventArgs`1"/> class with the default payload value.
+            </summary>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Events.GenericEventArgs`1.#ctor(`0)">
+            <summary>
+            Initializes a new instance of the <see cref="T:QscQsys.ModuleFramework.Events.GenericEventArgs`1"/> class with the specified payload.
+            </summary>
+            <param name="payload">The payload value.</param>
+        </member>
+        <member name="P:QscQsys.ModuleFramework.Events.GenericEventArgs`1.Payload">
+            <summary>
+            Gets the payload value.
+            </summary>
+        </member>
+        <member name="M:QscQsys.Communications.Sockets.ConnectionStatusChangeEventArgs.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:QscQsys.Communications.Sockets.ConnectionStatusChangeEventArgs"/> class with an empty payload.
+            </summary>
+        </member>
+        <member name="M:QscQsys.Communications.Sockets.ConnectionStatusChangeEventArgs.#ctor(QscQsys.Communications.Sockets.ConnectionStatusChangePayload)">
+            <summary>
+            Initializes a new instance of the <see cref="T:QscQsys.Communications.Sockets.ConnectionStatusChangeEventArgs"/> class with the specified payload.
+            </summary>
+            <param name="payload">The connection status change payload.</param>
+        </member>
+        <member name="T:QscQsys.Communications.Sockets.TcpClient">
+            <summary>
+            Represents a TCP client for socket communication.
+            </summary>
+        </member>
+        <member name="M:QscQsys.Communications.Sockets.TcpClient.#ctor">
+            <summary>
+            Initializes a new instance of the TcpClient class.
+            </summary>
+        </member>
+        <member name="M:QscQsys.Communications.Sockets.TcpClient.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the TcpClient class with the specified ID.
+            </summary>
+            <param name="id">The ID of the client.</param>
+        </member>
+        <member name="M:QscQsys.Communications.Sockets.TcpClient.#ctor(QscQsys.ModuleFramework.Logging.ILogger)">
+            <summary>
+            Initializes a new instance of the TcpClient class with the specified logger.
+            </summary>
+            <param name="logger">The logger to use for logging.</param>
+        </member>
+        <member name="M:QscQsys.Communications.Sockets.TcpClient.#ctor(System.String,QscQsys.ModuleFramework.Logging.ILogger)">
+            <summary>
+            Initializes a new instance of the TcpClient class with the specified ID and logger.
+            </summary>
+            <param name="id">The ID of the client.</param>
+            <param name="logger">The logger to use for logging.</param>
+        </member>
+        <member name="M:QscQsys.Communications.Sockets.TcpClient.Connect">
+            <summary>
+            Connects to the TCP server.
+            </summary>
+        </member>
+        <member name="M:QscQsys.Communications.Sockets.TcpClient.Connect(System.String,System.UInt16)">
+            <summary>
+            Connects to the TCP server at the specified IP address and port.
+            </summary>
+            <param name="ipAddress">The IP address of the TCP server.</param>
+            <param name="port">The port number of the TCP server.</param>
+        </member>
+        <member name="M:QscQsys.Communications.Sockets.TcpClient.Disconnect">
+            <summary>
+            Disconnects from the TCP server.
+            </summary>
+        </member>
+        <member name="M:QscQsys.Communications.Sockets.TcpClient.SendCommand(System.String)">
+            <summary>
+            Sends a command to the TCP server.
+            </summary>
+            <param name="command">The command to send.</param>
+        </member>
+        <member name="M:QscQsys.Communications.Sockets.TcpClient.SendCommand(System.Char[])">
+            <summary>
+            Sends a command to the TCP server.
+            </summary>
+            <param name="command">The command to send as a character array.</param>
+        </member>
+        <member name="M:QscQsys.Communications.Sockets.TcpClient.SendCommand(System.Byte[])">
+            <summary>
+            Sends a command to the TCP server.
+            </summary>
+            <param name="command">The command to send as a byte array.</param>
+        </member>
+        <member name="M:QscQsys.Communications.StringExtensions.ReplaceHex(System.String)">
+            <summary>
+            Replaces hex with ascii representation ex. \x0d = [0D]
+            </summary>
+            <param name="source">String to replace hex</param>
+            <returns></returns>
+        </member>
+        <member name="T:QscQsys.ModuleFramework.Events.UShortEventArgs">
+            <summary>
+            Represents event arguments containing an unsigned short (ushort) payload.
+            </summary>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Events.UShortEventArgs.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:QscQsys.ModuleFramework.Events.UShortEventArgs"/> class with the minimum possible ushort value as the default payload.
+            </summary>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Events.UShortEventArgs.#ctor(System.UInt16)">
+            <summary>
+            Initializes a new instance of the <see cref="T:QscQsys.ModuleFramework.Events.UShortEventArgs"/> class with the specified ushort payload.
+            </summary>
+            <param name="payload">The ushort value to be set as the payload.</param>
+        </member>
+        <member name="T:QscQsys.ModuleFramework.Events.UShortEventHandler">
+            <summary>
+            Represents the method that handles events with a ushort payload.
+            </summary>
+            <param name="sender">The event sender.</param>
+            <param name="args">The event arguments.</param>
+        </member>
+        <member name="T:QscQsys.ModuleFramework.Events.StringEventHandler">
+            <summary>
+            Represents the method that handles events with a string payload.
+            </summary>
+            <param name="sender">The event sender.</param>
+            <param name="args">The event arguments.</param>
+        </member>
+        <member name="T:QscQsys.ModuleFramework.Events.StringEventArgs">
+            <summary>
+            Represents event arguments containing a string payload.
+            </summary>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Events.StringEventArgs.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:QscQsys.ModuleFramework.Events.StringEventArgs"/> class with an empty string as the default payload.
+            </summary>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Events.StringEventArgs.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:QscQsys.ModuleFramework.Events.StringEventArgs"/> class with the specified string payload.
+            </summary>
+            <param name="payload">The string value to be set as the payload.</param>
+        </member>
+        <member name="T:QscQsys.ModuleFramework.Events.BoolEventHandler">
+            <summary>
+            Represents the method that handles events with a boolean payload.
+            </summary>
+            <param name="sender">The event sender.</param>
+            <param name="args">The event arguments.</param>
+        </member>
+        <member name="T:QscQsys.ModuleFramework.Events.BoolEventArgs">
+            <summary>
+            Represents event arguments containing a boolean payload.
+            </summary>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Events.BoolEventArgs.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:QscQsys.ModuleFramework.Events.BoolEventArgs"/> class with a default payload value of false.
+            </summary>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Events.BoolEventArgs.#ctor(System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:QscQsys.ModuleFramework.Events.BoolEventArgs"/> class with the specified boolean payload.
+            </summary>
+            <param name="payload">The boolean value to be converted and set as the payload.</param>
+        </member>
+        <member name="T:QscQsys.ModuleFramework.Logging.DebugLevels">
+            <summary>
+            Specifies the debug levels for logging and debugging.
+            </summary>
+        </member>
+        <member name="F:QscQsys.ModuleFramework.Logging.DebugLevels.Disabled">
+            <summary>
+            Debugging and logging are disabled.
+            </summary>
+        </member>
+        <member name="F:QscQsys.ModuleFramework.Logging.DebugLevels.LoggingEnabled">
+            <summary>
+            Logging is enabled, but debugging is disabled.
+            </summary>
+        </member>
+        <member name="F:QscQsys.ModuleFramework.Logging.DebugLevels.DebugEnabled">
+            <summary>
+            Debugging is enabled, but logging is disabled.
+            </summary>
+        </member>
+        <member name="F:QscQsys.ModuleFramework.Logging.DebugLevels.AllEnabled">
+            <summary>
+            Both debugging and logging are enabled.
+            </summary>
+        </member>
+        <member name="T:QscQsys.ModuleFramework.Logging.ILogger">
+            <summary>
+            Represents an interface for logging functionality.
+            </summary>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Logging.ILogger.Print(System.Object)">
+            <summary>
+            Prints the string representation of an object.
+            </summary>
+            <param name="obj">The object to print.</param>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Logging.ILogger.Print(System.String,System.Object[])">
+            <summary>
+            Prints a formatted string using the specified format string and arguments.
+            </summary>
+            <param name="message">The format string.</param>
+            <param name="args">The arguments to format the string.</param>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Logging.ILogger.PrintLine(System.Object)">
+            <summary>
+            Prints the string representation of an object followed by a new line.
+            </summary>
+            <param name="obj">The object to print.</param>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Logging.ILogger.PrintLine(System.String,System.Object[])">
+            <summary>
+            Prints a formatted string using the specified format string and arguments, followed by a new line.
+            </summary>
+            <param name="message">The format string.</param>
+            <param name="args">The arguments to format the string.</param>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Logging.ILogger.LogNotice(System.Object)">
+            <summary>
+            Logs a notice-level message by printing the string representation of an object.
+            </summary>
+            <param name="obj">The object to log as a notice.</param>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Logging.ILogger.LogNotice(System.String,System.Object[])">
+            <summary>
+            Logs a notice-level message by printing a formatted string using the specified format string and arguments.
+            </summary>
+            <param name="message">The format string.</param>
+            <param name="args">The arguments to format the string.</param>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Logging.ILogger.LogWarning(System.Object)">
+            <summary>
+            Logs a warning-level message by printing the string representation of an object.
+            </summary>
+            <param name="obj">The object to log as a warning.</param>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Logging.ILogger.LogWarning(System.String,System.Object[])">
+            <summary>
+            Logs a warning-level message by printing a formatted string using the specified format string and arguments.
+            </summary>
+            <param name="message">The format string.</param>
+            <param name="args">The arguments to format the string.</param>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Logging.ILogger.LogError(System.Object)">
+            <summary>
+            Logs an error-level message by printing the string representation of an object.
+            </summary>
+            <param name="obj">The object to log as an error.</param>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Logging.ILogger.LogError(System.String,System.Object[])">
+            <summary>
+            Logs an error-level message by printing a formatted string using the specified format string and arguments.
+            </summary>
+            <param name="message">The format string.</param>
+            <param name="args">The arguments to format the string.</param>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Logging.ILogger.LogException(System.Exception)">
+            <summary>
+            Logs an exception by printing the exception details.
+            </summary>
+            <param name="ex">The exception to log.</param>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Logging.ILogger.LogException(System.Exception,System.Object)">
+            <summary>
+            Logs an exception by printing the exception details along with the string representation of an object.
+            </summary>
+            <param name="ex">The exception to log.</param>
+            <param name="obj">The object to log along with the exception.</param>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Logging.ILogger.LogException(System.Exception,System.String,System.Object[])">
+            <summary>
+            Logs an exception by printing the exception details along with a formatted string using the specified format string and arguments.
+            </summary>
+            <param name="ex">The exception to log.</param>
+            <param name="message">The format string.</param>
+            <param name="args">The arguments to format the string.</param>
+        </member>
+        <member name="P:QscQsys.ModuleFramework.Logging.ILogger.DebugLevel">
+            <summary>
+            Gets or sets the debug level for logging and debugging.
+            </summary>
+        </member>
+        <member name="T:QscQsys.ModuleFramework.Logging.Logger">
+            <summary>
+            Represents a logger implementation that implements the ILogger interface.
+            </summary>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Logging.Logger.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:QscQsys.ModuleFramework.Logging.Logger"/> class with the specified ID.
+            </summary>
+            <param name="id">The ID of the logger.</param>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Logging.Logger.Print(System.Object)">
+            <summary>
+            Prints the string representation of an object.
+            </summary>
+            <param name="obj">The object to print.</param>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Logging.Logger.Print(System.String,System.Object[])">
+            <summary>
+            Prints a formatted string using the specified format string and arguments.
+            </summary>
+            <param name="message">The format string.</param>
+            <param name="args">The arguments to format the string.</param>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Logging.Logger.PrintLine(System.Object)">
+            <summary>
+            Prints the string representation of an object followed by a new line.
+            </summary>
+            <param name="obj">The object to print.</param>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Logging.Logger.PrintLine(System.String,System.Object[])">
+            <summary>
+            Prints a formatted string using the specified format string and arguments, followed by a new line.
+            </summary>
+            <param name="message">The format string.</param>
+            <param name="args">The arguments to format the string.</param>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Logging.Logger.LogNotice(System.Object)">
+            <summary>
+            Logs a notice-level message by printing the string representation of an object.
+            </summary>
+            <param name="obj">The object to log as a notice.</param>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Logging.Logger.LogNotice(System.String,System.Object[])">
+            <summary>
+            Logs a notice-level message by printing a formatted string using the specified format string and arguments.
+            </summary>
+            <param name="message">The format string.</param>
+            <param name="args">The arguments to format the string.</param>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Logging.Logger.LogWarning(System.Object)">
+            <summary>
+            Logs a warning-level message by printing the string representation of an object.
+            </summary>
+            <param name="obj">The object to log as a warning.</param>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Logging.Logger.LogWarning(System.String,System.Object[])">
+            <summary>
+            Logs a warning-level message by printing a formatted string using the specified format string and arguments.
+            </summary>
+            <param name="message">The format string.</param>
+            <param name="args">The arguments to format the string.</param>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Logging.Logger.LogError(System.Object)">
+            <summary>
+            Logs an error-level message by printing the string representation of an object.
+            </summary>
+            <param name="obj">The object to log as an error.</param>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Logging.Logger.LogError(System.String,System.Object[])">
+            <summary>
+            Logs an error-level message by printing a formatted string using the specified format string and arguments.
+            </summary>
+            <param name="message">The format string.</param>
+            <param name="args">The arguments to format the string.</param>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Logging.Logger.LogException(System.Exception)">
+            <summary>
+            Logs an exception by printing the exception details.
+            </summary>
+            <param name="ex">The exception to log.</param>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Logging.Logger.LogException(System.Exception,System.Object)">
+            <summary>
+            Logs an exception by printing the exception details along with the string representation of an object.
+            </summary>
+            <param name="ex">The exception to log.</param>
+            <param name="obj">The object to log along with the exception.</param>
+        </member>
+        <member name="M:QscQsys.ModuleFramework.Logging.Logger.LogException(System.Exception,System.String,System.Object[])">
+            <summary>
+            Logs an exception by printing the exception details along with a formatted string using the specified format string and arguments.
+            </summary>
+            <param name="ex">The exception to log.</param>
+            <param name="message">The format string.</param>
+            <param name="args">The arguments to format the string.</param>
+        </member>
+        <member name="P:QscQsys.ModuleFramework.Logging.Logger.DebugLevel">
+            <summary>
+            Gets or sets the debug level for logging and debugging.
+            </summary>
+        </member>
+        <member name="P:QscQsys.ModuleFramework.Logging.Logger.ID">
+            <summary>
+            Gets the ID of the logger.
+            </summary>
+        </member>
+        <member name="T:QscQsys.StringExtensionMethods">
+            <summary>
+            Extension methods for string manipulation
+            </summary>
+        </member>
+        <member name="M:QscQsys.StringExtensionMethods.Chunk(System.String,System.Int32)">
+            <summary>
+            Break a string up into maximum size chunks
+            </summary>
+            <param name="source">String to chunk</param>
+            <param name="maxChunkSize">Maximum size of chunks</param>
+            <returns></returns>
+        </member>
+        <member name="T:QscQsys.XSig">
+            <summary>
+            Helper methods for creating XSig byte sequences compatible with the Intersystem Communications (ISC) symbol.
+            </summary>
+            <remarks>Indexing is not from the start of each signal type but rather from the beginning of the first
+            analog signal for digital, analog, and serial outputs.</remarks>
+        </member>
+        <member name="M:QscQsys.XSig.ClearOutputs">
+            <summary>
+            Forces all outputs to 0.
+            </summary>
+            <returns>Bytes in XSig format for clear outputs trigger.</returns>
+        </member>
+        <member name="M:QscQsys.XSig.SendStatus">
+            <summary>
+            Evaluate all inputs and re-transmit any digital, analog, and permanent serail signals not set to 0.
+            </summary>
+            <returns>Bytes in XSig format for send status trigger.</returns>
+        </member>
+        <member name="M:QscQsys.XSig.GetBytes(System.Int32,System.Boolean)">
+            <summary>
+            Get bytes for a single digital signal.
+            </summary>
+            <param name="index">0-based digital index</param>
+            <param name="value">Digital data to be encoded</param>
+            <returns>Bytes in XSig format for digtial information.</returns>
+            <exception cref="T:System.ArgumentException">Index out of range for digital information encoded in XSig format.</exception>
+        </member>
+        <member name="M:QscQsys.XSig.GetBytes(System.Int32,System.Boolean[])">
+            <summary>
+            Get byte sequence for multiple digital signals.
+            </summary>
+            <param name="startIndex">Starting index of the sequence.</param>
+            <param name="values">Digital signal value array.</param>
+            <returns>Byte sequence in XSig format for digital signal information.</returns>
+        </member>
+        <member name="M:QscQsys.XSig.GetBytes(System.Int32,System.UInt16)">
+            <summary>
+            Get bytes for a single analog signal.
+            </summary>
+            <param name="index">0-based analog index</param>
+            <param name="value">Analog data to be encoded</param>
+            <returns>Bytes in XSig format for analog signal information.</returns>
+            <exception cref="T:System.ArgumentException">Index out of range for analog information encoded in XSig format.</exception>
+        </member>
+        <member name="M:QscQsys.XSig.GetBytes(System.Int32,System.UInt16[])">
+            <summary>
+            Get byte sequence for multiple analog signals.
+            </summary>
+            <param name="startIndex">Starting index of the sequence.</param>
+            <param name="values">Analog signal value array.</param>
+            <returns>Byte sequence in XSig format for analog signal information.</returns>
+        </member>
+        <member name="M:QscQsys.XSig.GetBytes(System.Int32,System.String)">
+            <summary>
+            Get bytes for a single serial signal.
+            </summary>
+            <param name="index">0-based serial index</param>
+            <param name="value">Serial data to be encoded</param>
+            <returns>Bytes in XSig format for serial signal information.</returns>
+            <exception cref="T:System.ArgumentException">Index out of range for serial information encoded in XSig format.</exception>
+        </member>
+        <member name="M:QscQsys.XSig.GetBytes(System.Int32,System.String[])">
+            <summary>
+            Get byte sequence for multiple serial signals.
+            </summary>
+            <param name="startIndex">Starting index of the sequence.</param>
+            <param name="values">Serial signal value array.</param>
+            <returns>Byte sequence in XSig format for serial signal information.</returns>
         </member>
     </members>
 </doc>

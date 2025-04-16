@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Crestron.SimplSharp;             				// For Basic SIMPL# Classes
-using ExtensionMethods;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using QscQsys.Communications.Sockets;
 using QscQsys.Intermediaries;
-using TCP_Client;
+using QscQsys.ModuleFramework.Events;
+using QscQsys.ModuleFramework.Logging;
 
 namespace QscQsys
 {
@@ -53,8 +54,11 @@ namespace QscQsys
         private readonly CTimer _commandQueueTimer;
         private readonly CTimer _heartbeatTimer;
         private readonly CTimer _waitForConnection;
-        private TCPClientDevice _primaryClient;
-        private TCPClientDevice _backupClient;
+        //private TCPClientDevice _primaryClient;
+        //private TCPClientDevice _backupClient;
+        private TcpClient _primaryClient;
+        private TcpClient _backupClient;
+        private Logger _logger = new Logger("QSYS");
         private StringBuilder _primaryRxData = new StringBuilder();
         private StringBuilder _backupRxData = new StringBuilder();
         private readonly object _primaryResponseLock = new object();
@@ -69,7 +73,7 @@ namespace QscQsys
         private bool _backupIsConnected;
         private bool _isLoggedIn;
         private bool _disposed;
-        private ushort _debug;
+        //private ushort _debug;
         private ushort _logonAttempts;
         private ushort _maxLogonAttempts = 2;
         private bool _isRedundant;
@@ -149,7 +153,7 @@ namespace QscQsys
         /// </summary>
         public ushort IsDebugMode
         {
-            get { return _debug; }
+            get { return _logger.DebugLevel > 0 ? (ushort)1 : (ushort)0; }
         }
 
         /// <summary>
@@ -220,43 +224,24 @@ namespace QscQsys
         /// </remarks>
         public void Debug(ushort value)
         {
-            _debug = value;
+            _logger.DebugLevel = (DebugLevels)value;
 
-            if (_primaryClient != null)
-            {
-                _primaryClient.Debug = _debug;
-            }
+            if (_logger.DebugLevel == DebugLevels.Disabled) return;
 
-            if (_backupClient != null)
-            {
-                _backupClient.Debug = _debug;
-            }
 
-            if (_debug <= 0) return;
-            CrestronConsole.PrintLine("********Qsys Debug Mode Active********");
-            CrestronConsole.PrintLine("See log for details");
-            ErrorLog.Notice("********Qsys Debug Mode Active********");
+            _logger.PrintLine("********Qsys Debug Mode Active********");
+            _logger.PrintLine("See log for details");
+            _logger.LogNotice("********Qsys Debug Mode Active********");
             if (QsysCoreManager.Is3Series)
             {
-                CrestronConsole.PrintLine("********Qsys Running On 3-Series********");
-                ErrorLog.Notice("********Qsys Running On 3-Series********");
+                _logger.PrintLine("********Qsys Running On 3-Series********");
+                _logger.LogNotice("********Qsys Running On 3-Series********");
             }
             else
             {
-                CrestronConsole.PrintLine("********Qsys Running On 4-Series Or Greater********");
-                ErrorLog.Notice("********Qsys Running On 4-Series Or Greater********");
+                _logger.PrintLine("********Qsys Running On 4-Series Or Greater********");
+                _logger.LogNotice("********Qsys Running On 4-Series Or Greater********");
             }
-
-            switch (_debug)
-            {
-                case 1:
-                    ErrorLog.Notice("Qsys debug level: Main communications");
-                    break;
-                case 2:
-                    ErrorLog.Notice("Qsys debug level: Main communications and verbose console");
-                    break;
-            }
-            ErrorLog.Notice("Qsys TCP ID 1710");
         }
 
         /// <summary>
@@ -284,12 +269,12 @@ namespace QscQsys
         /// </summary>
         public string PrimaryHost
         {
-            get { return _primaryClient == null ? string.Empty : _primaryClient.Host; }
+            get { return _primaryClient == null ? string.Empty : _primaryClient.IpAddress; }
             set
             {
                 if (_primaryClient != null)
                 {
-                    _primaryClient.Host = value;
+                    _primaryClient.IpAddress = value;
                 }
             }
         }
@@ -299,18 +284,18 @@ namespace QscQsys
         /// </summary>
         public string BackupHost
         {
-            get { return _backupClient == null ? string.Empty : _backupClient.Host; }
+            get { return _backupClient == null ? string.Empty : _backupClient.IpAddress; }
             set
             {
                 if (_backupClient == null) return;
-                if (_backupClient.Host == string.Empty)
+                if (_backupClient.IpAddress == string.Empty)
                 {
-                    _backupClient.Host = value;
+                    _backupClient.IpAddress = value;
                     _backupClient.Connect();
                     return;
                 }
 
-                _backupClient.Host = value;
+                _backupClient.IpAddress = value;
             }
         }
 
@@ -347,6 +332,7 @@ namespace QscQsys
                 try
                 {
                     _coreId = id;
+                    _logger = new Logger(string.Format("QSYS--{0}", _coreId));
 
                     _externalConnection = Convert.ToBoolean(useExternalConnection);
 
@@ -356,8 +342,7 @@ namespace QscQsys
 
                     QsysCoreManager.AddCore(this);
 
-                    if (_debug > 1)
-                        ErrorLog.Notice("QsysProcessor is initializing");
+                    _logger.LogNotice("QsysProcessor is initializing");
 
                     if (_externalConnection)
                     {
@@ -367,21 +352,26 @@ namespace QscQsys
                         return;
                     }
 
-                    _primaryClient = new TCPClientDevice {Debug = _debug, ID = id + "-primary"};
-                    _backupClient = new TCPClientDevice {Debug = _debug, ID = id + "-backup"};
+                    _primaryClient = new TcpClient(string.Format("QSYS--{0}--PrimaryTcpClient", _coreId), _logger);
+                    _backupClient = new TcpClient(string.Format("QSYS--{0}--BackupTcpClient", _coreId), _logger);
+                    //_primaryClient = new TCPClientDevice {Debug = _debug, ID = id + "-primary"};
+                    //_backupClient = new TCPClientDevice {Debug = _debug, ID = id + "-backup"};
 
-                    _primaryClient.ConnectionStatus += primaryClient_ConnectionStatus;
-                    _primaryClient.ResponseString += primaryClient_ResponseString;
-                    _backupClient.ConnectionStatus += backupClient_ConnectionStatus;
-                    _backupClient.ResponseString += backupClient_ResponseString;
+                    _primaryClient.ConnectedChange += primaryClient_ConnectedChange;
+                    //_primaryClient.ConnectionStatus += primaryClient_ConnectionStatus;
+                    _primaryClient.ResponseReceived += primaryClient_ResponseReceived;
+                    //_primaryClient.ResponseString += primaryClient_ResponseString;
+                    _backupClient.ConnectedChange += backupClient_ConnectedChange;
+                    //_backupClient.ConnectionStatus += backupClient_ConnectionStatus;
+                    _backupClient.ResponseReceived += backupClient_ResponseReceived;
+                    //_backupClient.ResponseString += backupClient_ResponseString;
                     _primaryClient.Connect(primaryHost, port);
                     if(backupHost != string.Empty)
                         _backupClient.Connect(backupHost, port);
                 }
                 catch (Exception e)
                 {
-                    if (_debug > 0)
-                        ErrorLog.Error("Error in QsysProcessor Iniitialize: {0}", e.Message);
+                    _logger.LogException(e);
                 }
             }
         }
@@ -432,8 +422,7 @@ namespace QscQsys
 
                 _heartbeatTimer.Reset(15000, 15000);
 
-                if (_debug == 1 || _debug == 2)
-                    ErrorLog.Notice("QsysProcessor is initialized.");
+                _logger.LogNotice("QsysProcessor is initialized.");
 
                 _isInitialized = true;
 
@@ -646,11 +635,11 @@ namespace QscQsys
         #endregion
 
         #region TCP Client Events
-        private void primaryClient_ResponseString(string response, SimplSharpString id)
+        private void primaryClient_ResponseReceived(object sender, StringEventArgs args)
         {
             lock (_primaryParseLock)
             {
-                _primaryRxData.Append(response);
+                _primaryRxData.Append(args.Payload);
             }
 
             if (!CMonitor.TryEnter(_primaryResponseLock)) return;
@@ -666,8 +655,7 @@ namespace QscQsys
                     _primaryRxData.Remove(0, delimeterPos + 1);
                 }
 
-                if (_debug == 2)
-                    CrestronConsole.PrintLine("Primary response found ** {0} **", responseData);
+                _logger.PrintLine("Primary response found ** {0} **", responseData);
 
                 ParseInternalResponse(true, responseData);
             }
@@ -675,11 +663,11 @@ namespace QscQsys
             CMonitor.Exit(_primaryResponseLock);
         }
 
-        private void backupClient_ResponseString(string response, SimplSharpString id)
+        private void backupClient_ResponseReceived(object sender, StringEventArgs args)
         {
             lock (_backupParseLock)
             {
-                _backupRxData.Append(response);
+                _backupRxData.Append(args.Payload);
             }
 
             if (!CMonitor.TryEnter(_backupResponseLock)) return;
@@ -695,8 +683,7 @@ namespace QscQsys
                     _backupRxData.Remove(0, delimeterPos + 1);
                 }
 
-                if (_debug == 2)
-                    CrestronConsole.PrintLine("Backup response found ** {0} **", responseData);
+                _logger.PrintLine("Backup response found ** {0} **", responseData);
 
                 ParseInternalResponse(false, responseData);
             }
@@ -704,27 +691,25 @@ namespace QscQsys
             CMonitor.Exit(_backupResponseLock);
         }
 
-        private void primaryClient_ConnectionStatus(int status, SimplSharpString id)
+        private void primaryClient_ConnectedChange(object sender, ModuleFramework.Events.BoolEventArgs args)
         {
             try
             {
                 _connectionCritical.Enter();
-                if (status == 2 && !_primaryIsConnected)
+                if (args.Payload == 1 && !_primaryIsConnected)
                 {
                     _primaryIsConnected = true;
 
-                    if (_debug > 0)
-                        ErrorLog.Notice("QsysProcessor primary is connected.");
+                    _logger.LogNotice("QsysProcessor primary is connected.");
 
                     if (OnPrimaryIsConnected != null)
                         OnPrimaryIsConnected(_coreId, 1);
                 }
-                else if (_primaryIsConnected && status != 2)
+                else if (_primaryIsConnected && args.Payload != 1)
                 {
                     _primaryIsConnected = false;
 
-                    if (_debug > 0)
-                        ErrorLog.Error("QsysProcessor primary disconnected!");
+                    _logger.LogError("QsysProcessor primary disconnected!");
 
                     if (_primaryCoreActive) ResetInitialization();
 
@@ -734,8 +719,7 @@ namespace QscQsys
             }
             catch (Exception e)
             {
-                if (_debug > 0)
-                    ErrorLog.Error("Error in QsysProcessor primaryClient_ConnectionStatus: {0}", e.Message);
+                _logger.LogException(e);
             }
             finally
             {
@@ -743,27 +727,25 @@ namespace QscQsys
             }
         }
 
-        private void backupClient_ConnectionStatus(int status, SimplSharpString id)
+        private void backupClient_ConnectedChange(object sender, ModuleFramework.Events.BoolEventArgs args)
         {
             try
             {
                 _connectionCritical.Enter();
-                if (status == 2 && !_backupIsConnected)
+                if (args.Payload == 1 && !_backupIsConnected)
                 {
                     _backupIsConnected = true;
 
-                    if (_debug > 0)
-                        ErrorLog.Notice("QsysProcessor backup is connected.");
+                    _logger.LogNotice("QsysProcessor backup is connected.");
 
                     if (OnBackupIsConnected != null)
                         OnBackupIsConnected(_coreId, 1);
                 }
-                else if (_backupIsConnected && status != 2)
+                else if (_backupIsConnected && args.Payload != 1)
                 {
                     _backupIsConnected = false;
 
-                    if (_debug > 0)
-                        ErrorLog.Error("QsysProcessor backup disconnected!");
+                    _logger.LogError("QsysProcessor backup disconnected!");
 
                     if (_backupCoreActive) ResetInitialization();
 
@@ -773,8 +755,7 @@ namespace QscQsys
             }
             catch (Exception e)
             {
-                if (_debug > 0)
-                    ErrorLog.Error("Error in QsysProcessor backupClient_ConnectionStatus: {0}", e.Message);
+                _logger.LogException(e);
             }
             finally
             {
@@ -896,27 +877,24 @@ namespace QscQsys
                         }
                     }
 
-                    if (!_isLoggedIn)
+                    if (_isLoggedIn) return;
+                    _logger.LogNotice("QsysProcessor server ready, starting to send intialization strings.");
+
+                    if (_password.Length > 0 && _username.Length > 0)
                     {
-                        if (_debug == 1 || _debug == 2)
-                            ErrorLog.Notice("QsysProcessor server ready, starting to send intialization strings.");
+                        _logonAttempts = 1;
+                        _commandQueue.Enqueue(JsonConvert.SerializeObject(new Logon { Params = new LogonParams { User = _username, Password = _password } }));
+                    }
+                    else if((primaryCore && _primaryCoreActive) || (!primaryCore && _backupCoreActive))
+                    {
+                        _isLoggedIn = true;
 
-                        if (_password.Length > 0 && _username.Length > 0)
+                        if (OnIsLoggedIn != null)
                         {
-                            _logonAttempts = 1;
-                            _commandQueue.Enqueue(JsonConvert.SerializeObject(new Logon { Params = new LogonParams { User = _username, Password = _password } }));
+                            OnIsLoggedIn(_coreId, 1);
                         }
-                        else if((primaryCore && _primaryCoreActive) || (!primaryCore && _backupCoreActive))
-                        {
-                            _isLoggedIn = true;
 
-                            if (OnIsLoggedIn != null)
-                            {
-                                OnIsLoggedIn(_coreId, 1);
-                            }
-
-                            _waitForConnection.Reset(5000);
-                        }
+                        _waitForConnection.Reset(5000);
                     }
                 }
                 else if (returnString.Contains("error"))
@@ -938,10 +916,7 @@ namespace QscQsys
                     }
                     else
                     {
-                        if (_debug > 0)
-                        {
-                            ErrorLog.Error("Error in QsysProcessor max logon attempts reached");
-                        }
+                        _logger.LogError("Error in QsysProcessor max logon attempts reached");
                     }
                 }
                 else if (returnString.Contains("\"id\":") && returnString.Contains("\"result\":true"))
@@ -982,8 +957,7 @@ namespace QscQsys
             }
             catch (Exception e)
             {
-                if (_debug > 0)
-                    ErrorLog.Error("Error in QsysProcessor ParseInternalResponse: {0}", e.Message);
+                _logger.LogException(e);
             }
         }
 
@@ -1029,8 +1003,7 @@ namespace QscQsys
                 if (data == null)
                     return;
 
-                if (_debug == 2)
-                    CrestronConsole.PrintLine("Command sent -->{0}<--", data);
+                _logger.PrintLine("Command sent -->{0}<--", data);
 
                 if (!_externalConnection)
                 {
@@ -1055,16 +1028,14 @@ namespace QscQsys
 
                     foreach (var x in xs)
                     {
-                        if (_debug == 2)
-                            CrestronConsole.PrintLine("Command chuck sent externally length={0} -->{1}<--", x.Length, x);
+                        _logger.PrintLine("Command chunk sent externally length={0} -->{1}<--", x.Length, x);
                         externalSendCallback(_coreId, x);
                     }
                 }
             }
             catch (Exception e)
             {
-                if (_debug > 0)
-                    ErrorLog.Exception(string.Format("Error in QsysProcessor CommandQueueDequeue: {0}", e.Message), e);
+                _logger.LogException(e);
 
                 _commandQueue.Clear();
             }

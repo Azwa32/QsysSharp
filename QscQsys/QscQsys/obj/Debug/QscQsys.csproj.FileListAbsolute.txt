@@ -134,3 +134,15 @@ C:\Users\mathew.klucznyk.GUSS\OneDrive - GUSS\Crestron Modules\Mat\SIMPLSharp Pr
 C:\Users\mathew.klucznyk.GUSS\OneDrive - GUSS\Crestron Modules\Mat\SIMPLSharp Projects\Qsys\QscQsys\QscQsys\obj\Debug\ResolveAssemblyReference.cache
 C:\Users\mathew.klucznyk.GUSS\OneDrive - GUSS\Crestron Modules\Mat\SIMPLSharp Projects\Qsys\QscQsys\QscQsys\obj\Debug\QscQsys.dll
 C:\Users\mathew.klucznyk.GUSS\OneDrive - GUSS\Crestron Modules\Mat\SIMPLSharp Projects\Qsys\QscQsys\QscQsys\obj\Debug\QscQsys.pdb
+C:\Git\Qsys\QscQsys\QscQsys\obj\Debug\ResolveAssemblyReference.cache
+C:\Git\Qsys\QscQsys\QscQsys\obj\Debug\QscQsys.dll
+C:\Git\Qsys\QscQsys\QscQsys\obj\Debug\QscQsys.pdb
+C:\Git\Qsys\QscQsys\QscQsys\bin\Debug\QscQsys.xml
+C:\Git\Qsys\QscQsys\QscQsys\bin\Debug\QscQsys.dll
+C:\Git\Qsys\QscQsys\QscQsys\bin\Debug\QscQsys.pdb
+C:\Git\Qsys\QscQsys\QscQsys\bin\Debug\SimplSharpCustomAttributesInterface.dll
+C:\Git\Qsys\QscQsys\QscQsys\bin\Debug\SimplSharpHelperInterface.dll
+C:\Git\Qsys\QscQsys\QscQsys\bin\Debug\SimplSharpNewtonsoft.dll
+C:\Git\Qsys\QscQsys\QscQsys\bin\Debug\SimplSharpReflectionInterface.dll
+C:\Git\Qsys\QscQsys\QscQsys\bin\Debug\SimplSharpSQLHelperInterface.dll
+C:\Git\Qsys\QscQsys\QscQsys\bin\Debug\Newtonsoft.Json.Compact.dll
