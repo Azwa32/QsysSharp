@@ -272,10 +272,9 @@ namespace QscQsys
             get { return _primaryClient == null ? string.Empty : _primaryClient.IpAddress; }
             set
             {
-                if (_primaryClient != null)
-                {
+                if (_primaryClient == null) return;
+
                     _primaryClient.IpAddress = value;
-                }
             }
         }
 
@@ -288,12 +287,6 @@ namespace QscQsys
             set
             {
                 if (_backupClient == null) return;
-                if (_backupClient.IpAddress == string.Empty)
-                {
-                    _backupClient.IpAddress = value;
-                    _backupClient.Connect();
-                    return;
-                }
 
                 _backupClient.IpAddress = value;
             }
