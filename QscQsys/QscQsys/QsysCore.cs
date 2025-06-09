@@ -615,7 +615,7 @@ namespace QscQsys
             control.OnSubscribeChanged -= ControlOnSubscribeChanged;
         }
 
-        private void ControlOnSubscribeChanged(object sender, BoolEventArgs args)
+        private void ControlOnSubscribeChanged(object sender, DataBoolEventArgs args)
         {
             if (!args.Data)
                 return;

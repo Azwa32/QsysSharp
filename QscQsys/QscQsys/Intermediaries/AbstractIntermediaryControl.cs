@@ -4,7 +4,7 @@ namespace QscQsys.Intermediaries
     public abstract class AbstractIntermediaryControl : IQsysIntermediaryControl
     {
         public event EventHandler<QsysInternalEventsArgs> OnStateChanged;
-        public event EventHandler<BoolEventArgs> OnSubscribeChanged;
+        public event EventHandler<DataBoolEventArgs> OnSubscribeChanged;
 
         private readonly string _name;
         private QsysStateData _state;
@@ -42,7 +42,7 @@ namespace QscQsys.Intermediaries
 
                 var handler = OnSubscribeChanged;
                 if (handler != null)
-                    handler(this, new BoolEventArgs(_subscribe));
+                    handler(this, new DataBoolEventArgs(_subscribe));
             }
         }
 
