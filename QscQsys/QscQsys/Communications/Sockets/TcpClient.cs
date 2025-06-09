@@ -2,7 +2,6 @@
 using System.Linq;
 using Crestron.SimplSharp;
 using Crestron.SimplSharp.CrestronSockets;
-using Crestron.SimplSharp.Reflection;
 using QscQsys.ModuleFramework.Events;
 using QscQsys.ModuleFramework.Logging;
 
@@ -54,7 +53,7 @@ namespace QscQsys.Communications.Sockets
         /// <param name="id">The ID of the client.</param>
         /// <param name="logger">The logger to use for logging.</param>
         public TcpClient(string id, ILogger logger)
-            :base(id, logger)
+            : base(id, logger)
         {
             _retryTimer = new CTimer(x =>
                 Reconnect(), Timeout.Infinite);
@@ -81,7 +80,7 @@ namespace QscQsys.Communications.Sockets
 
                 if (numBytes > 0)
                 {
-                    var response = new string(client.IncomingDataBuffer.Take(numBytes).Select(b => (char) b).ToArray());
+                    var response = new string(client.IncomingDataBuffer.Take(numBytes).Select(b => (char)b).ToArray());
                     OnResponseReceived(new StringEventArgs(response));
                 }
             }
@@ -110,7 +109,7 @@ namespace QscQsys.Communications.Sockets
                 var status = GetSocketStatusName(clientSocketStatus);
                 Logger.LogNotice("SocketStatus changed {0}", status);
 
-                OnConnectedChange(new ModuleFramework.Events.BoolEventArgs(ProtectedConnected));
+                OnConnectedChange(new BoolEventArgs(ProtectedConnected));
                 OnConnectionStatusChange(
                     new ConnectionStatusChangeEventArgs(new ConnectionStatusChangePayload((ushort)clientSocketStatus,
                         status)));
@@ -122,7 +121,9 @@ namespace QscQsys.Communications.Sockets
         /// </summary>
         public override void Connect()
         {
-            Connect(ProtectedIpAddress, ProtectedPort);
+            var ipaddress = IpAddress;
+            var port = Port;
+            Connect(ipaddress, port);
         }
 
         /// <summary>
@@ -134,27 +135,33 @@ namespace QscQsys.Communications.Sockets
         {
             ThrowIfDisposed();
 
-            ProtectedIpAddress = ipAddress;
-            ProtectedPort = port;
-
-            if (ProtectedIpAddress.Length <= 0 && ProtectedPort <= 0)
-            {
-                Logger.LogError("Host length is less than 1 or port is set to 0");
-                return;
-            }
-
             lock (MainLock)
             {
-                if (ProtectedConnected)
-                    return;
+                ProtectedIpAddress = ipAddress;
+                ProtectedPort = port;
 
-                Logger.PrintLine("Connection starting {0}:{1}...", ProtectedIpAddress, ProtectedPort);
+                if (string.IsNullOrEmpty(ipAddress) && port <= 0)
+                {
+                    Logger.LogError("Host is null or emptry and/or port is set to 0");
+                    return;
+                }
+                if (ProtectedConnected)
+                {
+                    Disconnect();
+                }
+
+                Logger.PrintLine("Connection starting {0}:{1}...", ipAddress, port);
+                Logger.LogNotice("Connection starting {0}:{1}...", ipAddress, port);
                 _retryTimer.Stop();
-                _client = new TCPClient(ProtectedIpAddress, ProtectedPort, 65535);
-                _client.SocketStatusChange -= Client_SocketStatusChange;
+
+                if (_client != null)
+                    _client.SocketStatusChange -= Client_SocketStatusChange;
+
+                _client = new TCPClient(ipAddress, port, 65535);
                 _client.SocketStatusChange += Client_SocketStatusChange;
                 _disconnectRequested = false;
                 _client.ConnectToServerAsync(ConnectToServerCallback);
+                ConnectionRequested = true;
             }
         }
 
@@ -171,7 +178,7 @@ namespace QscQsys.Communications.Sockets
                 if (ProtectedConnected || _disconnectRequested)
                     return;
 
-                Logger.PrintLine("Connection was not established in 15 seconds, retrying...");
+                Logger.PrintLine("Connection was not established, retrying...");
                 _client.ConnectToServerAsync(ConnectToServerCallback);
             }
         }
@@ -214,12 +221,15 @@ namespace QscQsys.Communications.Sockets
                 if (ProtectedDisposed)
                     return;
 
+                ConnectionRequested = false;
+
                 if (_client == null)
                     return;
 
                 if (!ProtectedConnected)
                     return;
 
+                Logger.LogNotice("Connection closing...");
                 Logger.PrintLine("Connection closing...");
                 _disconnectRequested = true;
 
@@ -237,7 +247,7 @@ namespace QscQsys.Communications.Sockets
         /// <param name="command">The command to send.</param>
         public override void SendCommand(string command)
         {
-            var data = command.ToCharArray().Select(c => (byte) c).ToArray();
+            var data = command.ToCharArray().Select(c => (byte)c).ToArray();
             SendCommand(data);
         }
 
@@ -247,9 +257,9 @@ namespace QscQsys.Communications.Sockets
         /// <param name="command">The command to send as a character array.</param>
         public override void SendCommand(char[] command)
         {
-            if(command == null)
+            if (command == null)
                 return;
-            
+
             var data = new byte[command.Length];
 
             for (var i = 0; i < command.Length; i++)
@@ -306,7 +316,7 @@ namespace QscQsys.Communications.Sockets
                 if (disposing)
                 {
                     _retryTimer.Stop();
-                    _retryTimer.Dispose(); 
+                    _retryTimer.Dispose();
 
                     if (_client != null)
                     {

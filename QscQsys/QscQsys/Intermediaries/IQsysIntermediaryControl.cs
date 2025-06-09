@@ -6,7 +6,7 @@ namespace QscQsys.Intermediaries
     public interface IQsysIntermediaryControl : IQsysIntermediary
     {
         event EventHandler<QsysInternalEventsArgs> OnStateChanged;
-        event EventHandler<BoolEventArgs> OnSubscribeChanged;
+        event EventHandler<DataBoolEventArgs> OnSubscribeChanged;
 
         [CanBeNull]
         QsysStateData State { get; }

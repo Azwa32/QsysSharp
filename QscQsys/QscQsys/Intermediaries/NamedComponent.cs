@@ -258,7 +258,7 @@ namespace QscQsys.Intermediaries
             control.OnSubscribeChanged -= ControlOnSubscribeChanged;
         }
 
-        private void ControlOnSubscribeChanged(object sender, BoolEventArgs args)
+        private void ControlOnSubscribeChanged(object sender, DataBoolEventArgs args)
         {
             var control = sender as NamedComponentControl;
             

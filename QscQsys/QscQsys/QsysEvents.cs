@@ -72,12 +72,12 @@ namespace QscQsys
         }
     }
 
-    public sealed class BoolEventArgs : EventArgs
+    public sealed class DataBoolEventArgs : EventArgs
     {
         private bool _data;
         public bool Data { get { return _data; } }
 
-        public BoolEventArgs(bool data)
+        public DataBoolEventArgs(bool data)
         {
             _data = data;
         }

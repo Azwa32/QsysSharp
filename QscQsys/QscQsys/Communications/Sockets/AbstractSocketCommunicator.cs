@@ -10,6 +10,7 @@ namespace QscQsys.Communications.Sockets
     public abstract class AbstractSocketCommunicator : AbstractCommunicator, ISocketCommunicator
     {
         protected bool ProtectedConnected;
+        protected bool ConnectionRequested;
         protected string ProtectedIpAddress;
         protected ushort ProtectedPort;
 
@@ -52,16 +53,19 @@ namespace QscQsys.Communications.Sockets
         /// </summary>
         public string IpAddress
         {
-            get { return ProtectedIpAddress; }
+            get { lock (MainLock) return ProtectedIpAddress; }
             set
             {
-                if (ProtectedIpAddress == value)
-                    return;
+                lock (MainLock)
+                {
+                    if (ProtectedIpAddress == value)
+                        return;
 
-                ProtectedIpAddress = value;
+                    ProtectedIpAddress = value;
 
-                if (IsConnected)
-                    Connect();
+                    if (ConnectionRequested)
+                        Connect();
+                }
             }
         }
 
@@ -70,16 +74,19 @@ namespace QscQsys.Communications.Sockets
         /// </summary>
         public ushort Port
         {
-            get { return ProtectedPort; }
+            get { lock (MainLock) return ProtectedPort; }
             set
             {
-                if (ProtectedPort == value)
-                    return;
+                lock (MainLock)
+                {
+                    if (ProtectedPort == value)
+                        return;
 
-                ProtectedPort = value;
+                    ProtectedPort = value;
 
-                if (IsConnected)
-                    Connect();
+                    if (ConnectionRequested)
+                        Connect();
+                }
             }
         }
 
@@ -461,7 +468,7 @@ namespace QscQsys.Communications.Sockets
         /// Raises the ConnectedChange event with the provided event arguments.
         /// </summary>
         /// <param name="args">The event arguments.</param>
-        protected void OnConnectedChange(ModuleFramework.Events.BoolEventArgs args)
+        protected void OnConnectedChange(BoolEventArgs args)
         {
             var h = ConnectedChange;
 

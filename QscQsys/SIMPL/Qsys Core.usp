@@ -21,15 +21,15 @@ Default_PrimaryIpAddress[255], Default_BackupIpAddress[255];
 integer_parameter Default_Port;
 string_parameter Default_Username[100], Default_Password[100], CoreID[100];
 
-integer waitTillStart, _port;
 string _primaryIpa[255], _backupIpa[255], _username[100], _password[100];
+integer _waitTillStart, _allowProps, _port;
 
 QsysCore processor;
 
 threadsafe push Initialize
 {
-	while(!waitTillStart)
-	{}
+	while(!_waitTillStart);
+	
 	processor.Initialize(CoreID, _primaryIpa, _backupIpa, _port, _username, _password, UseExternalConnection);
 }
 
@@ -38,45 +38,74 @@ change DebugMode
 	processor.Debug(DebugMode);
 }
 
-change PrimaryIpAddress
+threadsafe change PrimaryIpAddress
 {
-	if(len(PrimaryIpAddress)) 	
+	while(!_allowProps);
+	
+	while(_primaryIpa != PrimaryIpAddress)
+	{
 		_primaryIpa = PrimaryIpAddress;
-	else
-		_primaryIpa = Default_PrimaryIpAddress;
-
-	processor.PrimaryHost = _primaryIpa;
+		if(_waitTillStart)
+		{	
+			processor.PrimaryHost = _primaryIpa;
+		}
+	}
 }
 
-change BackupIpAddress
+threadsafe change BackupIpAddress
 {
-	if(len(BackupIpAddress)) 
+	while(!_allowProps);
+	
+	while(_backupIpa != BackupIpAddress)
+	{
 		_backupIpa = BackupIpAddress;
-	else
-		_backupIpa = Default_BackupIpAddress;
-		
-	processor.BackupHost = _backupIpa;
+		if(_waitTillStart)
+		{
+			processor.BackupHost = _backupIpa;
+		}
+	}
 }
 
-change Username
+threadsafe change Username
 {
-	_username = Username;
-	processor.Username = _username;
+	while(!_allowProps);
+	
+	while(_username != Username)
+	{
+		_username = Username;
+		if(_waitTillStart)
+		{
+			processor.Username = _username;
+		}
+	}
 }
 
-change Password
+threadsafe change Password
 {
-	_password = Password;
-	processor.Password = _password;
+	while(!_allowProps);
+	
+	while(_password != Password)
+	{
+		_password = Password;
+		if(_waitTillStart)
+		{
+			processor.Password = _password;
+		}
+	}
 }
 
-change Port
+threadsafe change Port
 {
-	if(Port)
+	while(!_allowProps);
+	
+	while(_port != Port)
+	{
 		_port = Port;
-	else
-		_port = Default_Port;
-	processor.Port = _port;
+		if(_waitTillStart)
+		{
+			processor.Port = _port;
+		}
+	}
 }
 
 callback function NewIsRegistered(string id, integer value)
@@ -146,30 +175,11 @@ Function Main()
 {    
 	WaitForInitializationComplete();
 	
-	if(Port)
-		_port = Port;
-	else
-		_port = Default_Port;
-
-	if(len(PrimaryIpAddress))
-		_primaryIpa = PrimaryIpAddress;
-	else
-		_primaryIpa = Default_PrimaryIpAddress;
-
-	if(len(BackupIpAddress))
-		_backupIpa = BackupIpAddress;
-	else
-		_backupIpa = Default_BackupIpAddress;
-
-	if(len(Username))
-		_username = Username;
-	else
-		_username = Default_Username;
-
-	if(len(Password))
-		_password = Password;
-	else
-		_password = Default_Password;
+	_port = Default_Port;
+	_primaryIpa = Default_PrimaryIpAddress;
+	_backupIpa = Default_BackupIpAddress;
+	_username = Default_Username;
+	_password = Default_Password;
 	
 	if(GatherAsync("\x00", Response, RxGatherHandler, 500) = -1)
 	{
@@ -184,7 +194,9 @@ Function Main()
 	RegisterDelegate(processor, OnIsLoggedIn, NewIsLoggedIn);
 	RegisterDelegate(processor, OnSendingCommand, NewSendingCommand);
 	
+	_allowProps = 1;
+	
 	//do not remove delay, we need to wait until all objects are instatiated and ready
 	delay(1000);
-	waitTillStart = 1;
+	_waitTillStart = 1;
 }
