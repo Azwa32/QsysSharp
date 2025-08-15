@@ -1,0 +1,3 @@
+when copying into project:
+copy both "QsysSharp" & "packages" into the project folder
+then import existing project .csproj into the projects top level within visual studio
