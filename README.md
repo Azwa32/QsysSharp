@@ -1,7 +1,7 @@
 Forked version of MatKlucznyk's Qsys Module for Crestron
 This version is Simpl# C# only modified to work in Visual Studio 2022
 
-#### Importing
+### Importing
 Copying working folder/project into another project:
 This is useful when you are still developing a project imported into another project 
 copy both "my_project" & "packages" into the project folder
@@ -14,7 +14,7 @@ add the my_project.dll to the project folder
 on your core project right click project and add reference, then navigate to my_project\bin\Debug and add my_project.dll
 To access the methods use the Namespace of the imported compiled program (.dll)
 
-#### Initialisation 
+### Initialisation 
 QsysCore = new QsysCore();
 QsysCore.Initialise();
 
@@ -27,7 +27,8 @@ Set debug level for debug print:
 QsysCore.Debug();
 
 
-Example Init:
+### Example
+Init:
 QsysCore = new QsysCore();
 QsysCore.OnPrimaryIsConnected += QsysCore_PrimaryIsConnected;
 QsysCore.LazyLoadNamedControl("MyNamedControl").OnStateChanged += QsysCore_MyNamedControl_OnStateChanged;
