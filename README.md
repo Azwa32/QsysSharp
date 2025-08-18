@@ -20,11 +20,11 @@ QsysCore = new QsysCore();
 QsysCore.Initialise();
 ```
 
-Initialise Named control for feedback
+Initialise Named control for feedback (only required for fb)
 ```c#
 QsysCore.LazyLoadNamedControl("My_Control").OnStateChanged += QsysCore_MyControl_OnStateChanged;
 ```
-create the callback function:
+create the callback function for feedback (only required for fb):
 ```c#
 QsysCore_MyControl_OnStateChanged(object sender, QsysInternalEventsArgs e)
 ```
@@ -50,3 +50,10 @@ private void QsysCore_MyNamedControl_OnStateChanged(object sender, QsysInternalE
   CrestronConsole.PrintLine("MyControl State Changed: {0} - {1}", sender, e.BoolValue);
 }
 ```
+Sending named control command (bool example)
+```c#
+QsysCore.LazyLoadNamedControl("MyControl").SendChangeBoolValue(true);
+```
+
+
+
