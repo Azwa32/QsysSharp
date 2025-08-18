@@ -86,6 +86,7 @@ namespace QsysSharp
         private string _coreId;
         private string _username;
         private string _password;
+        private ushort _port = 1710;
 
         private readonly Dictionary<string, NamedComponent> _components;
         private readonly Dictionary<string, Action<QsysStateData>> _componentUpdateCallbacks;
@@ -309,18 +310,21 @@ namespace QsysSharp
             set { _password = value; }
         }
 
-    #endregion
+        #endregion
 
         #region Initialization
         /// <summary>
         /// Initialzes all methods that are required to setup the class. Connection is established on port 1702.
+        /// id = core hostname, primaryHost/backupHost = ipaddress, username = username, password = password, useExternalConnection = 0 to use this modules TCP, 1 for external connection eg Crestron serial port.
         /// </summary>
-        public void Initialize(string id, string primaryHost, string backupHost, ushort port, string username, string password, ushort useExternalConnection)
+        public void Initialize(string id, string primaryHost, string backupHost, string username, string password, ushort useExternalConnection)
         {
             lock (_initLock)
             {
                 if (_isInitialized)
+                {
                     return;
+                }
 
                 try
                 {
@@ -358,9 +362,9 @@ namespace QsysSharp
                     //_backupClient.ConnectionStatus += backupClient_ConnectionStatus;
                     _backupClient.ResponseReceived += backupClient_ResponseReceived;
                     //_backupClient.ResponseString += backupClient_ResponseString;
-                    _primaryClient.Connect(primaryHost, port);
+                    _primaryClient.Connect(primaryHost, _port);
                     if(backupHost != string.Empty)
-                        _backupClient.Connect(backupHost, port);
+                        _backupClient.Connect(backupHost, _port);
                 }
                 catch (Exception e)
                 {
