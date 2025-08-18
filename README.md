@@ -1,5 +1,5 @@
 ## Forked version of MatKlucznyk's Qsys Module for Crestron
-This version is Simpl# C# only modified to work in Visual Studio 2022
+This version is Simpl# C# only modified to work in Visual Studio 2022 .Net
 
 ## Importing
 ### Copying working folder/project into another project:
