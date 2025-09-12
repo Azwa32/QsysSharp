@@ -1,4 +1,4 @@
-## Forked version of MatKlucznyk's Qsys Module for Crestron
+## Qsys C# Module for Crestron Simpl Sharp
 This version is Simpl# C# only and modified to work in .Net based programs (VS2022 etc)
 
 ## Importing
