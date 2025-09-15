@@ -1,5 +1,6 @@
 ## Qsys C# Module for Crestron Simpl Sharp
 This version is Simpl# C# only and modified to work in .Net based programs (VS2022 etc)
+15/09/25 Compatibility with .Net 6 added
 
 ## Importing
 ### Copying working folder/project into another project:
